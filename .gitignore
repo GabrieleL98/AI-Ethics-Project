@@ -1,0 +1,28 @@
+# --- Security ---
+# Ignore the kaggle.json file which contains API credentials for Kaggle
+.kaggle/
+kaggle.json
+# Ignora file che contengono "secret" o "token" nel nome
+*token*
+*secret*
+
+# --- Data ---
+# Avoid loading large datasets into version control
+*.csv
+*.zip
+*.json
+# Se vuoi tenere il file kaggle.json ma ignorare altri json, 
+# scrivi specificamente i nomi dei file.
+
+# --- PYTHON ---
+# temporary files
+__pycache__/
+*.pyc
+.venv/
+env/
+.env
+
+# --- VS CODE & OS ---
+.vscode/
+.DS_Store
+Thumbs.db
