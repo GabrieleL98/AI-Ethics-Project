@@ -3,5 +3,6 @@ numpy
 scikit-learn
 fairlearn
 aequitas
+aif360
 mlflow
 pytest
