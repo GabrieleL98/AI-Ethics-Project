@@ -31,3 +31,31 @@ class FairnessAnalyzer:
         stats = self.df.groupby(sensitive_col).size()
         return stats
 
+    def calculate_selection_rate(self, target_col, sensitive_col, positive_label):
+        """
+        Calculate the selection rate (approval rate) for each sensitive group.
+        Selection Rate = (Positive Outcomes in Group) / (Total Individuals in Group)
+        """
+        # Calculate selection rate for each group
+        selection_rates = self.df.groupby(sensitive_col, observed=False)[target_col].apply(
+            lambda x: (x == positive_label).sum() / len(x)
+        )
+        
+        return selection_rates
+
+    def calculate_demographic_parity(self, selection_rates):
+        """
+        Calculate Demographic Parity Ratio by comparing the lowest rate with the highest.
+        Ratio = Min Selection Rate / Max Selection Rate
+        """
+        min_rate = selection_rates.min()
+        max_rate = selection_rates.max()
+    
+        # Avoid division by zero
+        if max_rate == 0:
+            return 0.0
+        
+        parity_ratio = min_rate / max_rate
+        return parity_ratio
+
+        
