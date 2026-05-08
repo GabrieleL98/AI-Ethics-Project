@@ -11,6 +11,9 @@ sample_sizes, and metadata.
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
+from typing import Any, Dict, Optional, Tuple
+
 import warnings
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
