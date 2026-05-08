@@ -289,33 +289,31 @@ class FairnessAnalyzer:
     ) -> Tuple[float, float]:
         """
         Requirement 4 – 95% Bootstrap Confidence Interval.
-
-        Parameters
-        ----------
-        metric_func:
-            A function that takes a DataFrame (same schema as ``df``) and
-            returns a scalar metric value.
-        df:
-            The DataFrame to resample from.
-        n_iterations:
-            Number of bootstrap replications.
-        random_state:
-            Seed for reproducibility.
+        Optimized: stratified sampling + pre-reset index for speed.
         """
         rng = np.random.default_rng(random_state)
         stats: List[float] = []
-        n = len(df)
-        indices = np.arange(n)
+
+        # Pre-reset index once instead of inside the loop
+        df_reset = df.reset_index(drop=True)
+
+        # Pre-compute group indices once (stratified bootstrap)
+        groups = df.groupby(self.sensitive_col, sort=False)
+        group_indices = {name: grp.index.to_numpy() for name, grp in groups}
 
         for _ in range(n_iterations):
-            sample_idx = rng.choice(indices, size=n, replace=True)
-            sample = df.iloc[sample_idx].reset_index(drop=True)
+            # Stratified resample: sample within each group independently
+            sampled_idx = np.concatenate([
+                rng.choice(idxs, size=len(idxs), replace=True)
+                for idxs in group_indices.values()
+            ])
+            sample = df_reset.iloc[sampled_idx].reset_index(drop=True)
             try:
                 val = metric_func(sample)
                 if np.isfinite(val):
                     stats.append(val)
-            except Exception:  # noqa: BLE001
-                pass  # skip degenerate samples (e.g. only one class)
+            except Exception:
+                pass
 
         if not stats:
             raise RuntimeError("Bootstrap produced no valid samples.")
@@ -323,7 +321,6 @@ class FairnessAnalyzer:
         lower = float(np.percentile(stats, 2.5))
         upper = float(np.percentile(stats, 97.5))
         return lower, upper
-
     # ------------------------------------------------------------------
     # Classification metrics (Requirement 3)
     # ------------------------------------------------------------------
@@ -606,19 +603,10 @@ class FairnessAnalyzer:
 
     def get_fairness_audit(
         self,
-        n_bootstrap: int = 1000,
+        n_bootstrap: int = 200,
         random_state: Optional[int] = None,
         min_group_size: int = 5,
     ) -> FairnessResult:
-        """
-        Requirement 4 – Statistical Validation Framework.
-
-        Returns a FairnessResult with:
-        - point estimate (selection-rate difference)
-        - 95% bootstrap CI
-        - Risk Ratio as effect size
-        - group sample sizes
-        """
         self._require_config()
 
         filtered_df, excluded = self._filter_by_group_size(
@@ -633,20 +621,29 @@ class FairnessAnalyzer:
         base_rate = float(rates[priv_group])
         target_rate = float(rates[unpriv_group])
 
-        # Point estimate: absolute difference
         point_estimate = base_rate - target_rate
-
-        # Risk Ratio (effect size)
         risk_ratio = target_rate / base_rate if base_rate > 0 else None
 
-        # Bootstrap CI on the *unprivileged* group's selection rate
-        def _unpriv_rate(df: pd.DataFrame) -> float:
-            sub = df[df[self.sensitive_col] == unpriv_group]
-            if len(sub) == 0:
-                return float("nan")
-            return float((sub[self.target_col] == self.positive_label).mean())
+        # ✅ CI sulla differenza — coerente con il point estimate
+        def _rate_diff(df: pd.DataFrame) -> float:
+            col = df[self.sensitive_col]
+            target_col = df[self.target_col]
+            pos = target_col == self.positive_label
 
-        ci = self._compute_bootstrap_ci(_unpriv_rate, filtered_df, n_bootstrap, random_state)
+            priv_mask = col == priv_group
+            unpriv_mask = col == unpriv_group
+
+            n_priv = priv_mask.sum()
+            n_unpriv = unpriv_mask.sum()
+
+            if n_priv == 0 or n_unpriv == 0:
+                return float("nan")
+
+            return float(pos[priv_mask].mean()) - float(pos[unpriv_mask].mean())
+
+        ci = self._compute_bootstrap_ci(
+            _rate_diff, filtered_df, n_bootstrap, random_state
+        )
 
         return FairnessResult(
             metric_name="Selection Rate Disparity",
@@ -663,7 +660,6 @@ class FairnessAnalyzer:
                 "excluded_groups": excluded,
             },
         )
-
     # ------------------------------------------------------------------
     # Aequitas integration  – Requirement 2 (third library)
     # ------------------------------------------------------------------
@@ -720,7 +716,6 @@ class FairnessAnalyzer:
             xtab,
             ae_df,
             ref_groups_dict={self.sensitive_col: ref_group},
-            mask_entities=False,
         )
         return bias_df
 
