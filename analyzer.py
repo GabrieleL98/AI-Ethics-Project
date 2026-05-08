@@ -450,7 +450,7 @@ class FairnessAnalyzer:
                 confidence_interval=eo_ci,
                 effect_size=None,  # EO diff has no canonical single effect size
                 sample_sizes=sample_sizes,
-                metadata={"library": "Fairlearn", "excluded_groups": excluded},"positive_rate_by_group": rates.to_dict(),
+                metadata={"library": "Fairlearn", "excluded_groups": excluded,"positive_rate_by_group": rates.to_dict(),}
             )
 
         elif engine == "aif360":
