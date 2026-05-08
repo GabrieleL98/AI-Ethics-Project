@@ -62,8 +62,6 @@ def _import_aequitas():
 @dataclass
 class FairnessResult:
     """
-    Requirement 4 – Structured object for every metric output.
-
     Attributes
     ----------
     metric_name:
