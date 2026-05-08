@@ -118,7 +118,7 @@ Metrics and parameters are logged automatically when MLflow is configured in you
 
 ## Dataset
 
-Tested on the [Loan Approval dataset](https://www.kaggle.com/) from Kaggle, using Gender, Age, Income, and Credit Score as sensitive and target attributes.
+Tested on the [Loan Approval dataset](https://www.kaggle.com/datasets/arbaaztamboli/loan-approval-dataset) from Kaggle, using Gender, Age, Income, and Credit Score as sensitive and target attributes.
 
 ---
 
