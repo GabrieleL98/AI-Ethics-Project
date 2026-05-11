@@ -1,0 +1,110 @@
+# config.yml
+# ==========
+# Configuration file for the Fair Pipeline Framework.
+# Controls which bias checks to run, which transformers to apply,
+# and the parameters for each step.
+#
+# Usage (in demo.ipynb):
+#   from pipeline_framework import FairPipelineBuilder
+#   builder = FairPipelineBuilder.from_config("config.yml")
+#   pipeline = builder.build()
+
+# ---------------------------------------------------------------------------
+# Dataset
+# ---------------------------------------------------------------------------
+dataset:
+  path: "loan_approval_dataset.csv"
+  target_col: "Loan_Status"
+  sensitive_cols:
+    - "Gender"
+    - "Age_Group"
+  positive_label: 1
+  # Optional: columns to drop before building the pipeline
+  drop_cols: []
+
+# ---------------------------------------------------------------------------
+# Bias Detection (Stage 1)
+# ---------------------------------------------------------------------------
+bias_detection:
+  enabled: true
+  output_path: "reports/bias_report.json"
+  p_threshold: 0.05          # significance level for disparity tests
+  proxy_threshold: 0.30      # correlation above which a feature is a proxy
+  representation_gap: 0.05   # max allowed deviation from benchmark
+
+  # Expected demographic distribution (optional).
+  # If omitted, uniform distribution is assumed per group.
+  benchmarks:
+    Gender:
+      Male: 0.50
+      Female: 0.50
+
+# ---------------------------------------------------------------------------
+# Preprocessing
+# ---------------------------------------------------------------------------
+preprocessing:
+  # Bin continuous columns before the pipeline runs
+  binning:
+    - column: "Age"
+      bins: [0, 25, 35, 45, 55, 65, .inf]
+      labels: ["0-25", "26-35", "36-45", "46-55", "56-65", "65+"]
+      new_column: "Age_Group"
+
+# ---------------------------------------------------------------------------
+# Transformers (applied in order inside the sklearn Pipeline)
+# ---------------------------------------------------------------------------
+transformers:
+
+  - name: "disparate_impact_remover"
+    enabled: true
+    class: "DisparateImpactRemover"
+    params:
+      sensitive_col: "Gender"
+      repair_level: 0.8         # 0 = no repair, 1 = full repair
+
+  - name: "correlation_suppressor"
+    enabled: true
+    class: "CorrelationSuppressor"
+    params:
+      sensitive_col: "Gender"
+      threshold: 0.30
+      method: "auto"
+
+  - name: "instance_reweighting"
+    enabled: true
+    class: "InstanceReweighting"
+    params:
+      sensitive_col: "Gender"
+      target_col: "Loan_Status"
+      normalise: true
+
+  # SMOTEResampler is disabled by default because it changes row count
+  # and must be used outside the sklearn Pipeline (via fit_transform directly).
+  - name: "smote_resampler"
+    enabled: false
+    class: "SMOTEResampler"
+    params:
+      sensitive_col: "Gender"
+      target_col: "Loan_Status"
+      k_neighbors: 5
+      random_state: 42
+
+# ---------------------------------------------------------------------------
+# Classifier
+# ---------------------------------------------------------------------------
+classifier:
+  class: "LogisticRegression"
+  params:
+    random_state: 42
+    max_iter: 500
+    class_weight: "balanced"
+
+# ---------------------------------------------------------------------------
+# CI/CD Fairness Gates
+# Thresholds used by pytest (TestCICDThresholds) and assert_fairness().
+# ---------------------------------------------------------------------------
+fairness_gates:
+  max_representation_gap: 0.10        # max allowed group representation gap
+  max_proxy_correlation: 0.60         # max allowed feature-sensitive correlation
+  max_disparate_feature_rate: 0.70    # max fraction of features that may be disparate
+  min_reweighting_balance_ratio: 0.85 # min ratio of group weight sums after reweighting
