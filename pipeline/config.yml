@@ -64,7 +64,7 @@ transformers:
     enabled: true
     class: "InstanceReweighting"
     params:
-      sensitive_col: "Gender_Male"
+      sensitive_col: "Gender"
       target_col: "Loan_Approval_Status"
       normalise: true
 
