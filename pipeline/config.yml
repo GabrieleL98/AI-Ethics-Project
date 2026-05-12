@@ -32,6 +32,8 @@ bias_detection:
 # Preprocessing
 # ---------------------------------------------------------------------------
 preprocessing:
+  encode:
+    - column: "Gender"    # produces Gender_Male, Gender_Female
   binning:
     - column: "Age"
       bins: [0, 25, 35, 45, 55, 65, .inf]
@@ -64,7 +66,7 @@ transformers:
     enabled: true
     class: "InstanceReweighting"
     params:
-      sensitive_col: "Gender"
+      sensitive_col: "Gender_Male"
       target_col: "Loan_Approval_Status"
       normalise: true
 
@@ -87,3 +89,7 @@ fairness_gates:
   max_proxy_correlation: 0.60         # max allowed feature-sensitive correlation
   max_disparate_feature_rate: 0.70    # max fraction of features that may be disparate
   min_reweighting_balance_ratio: 0.85 # min ratio of group weight sums after reweighting
+
+col_map:
+  Gender: Gender_Male   # original → encoded name
+
