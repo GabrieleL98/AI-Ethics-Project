@@ -87,9 +87,22 @@ def _cramers_v(x: pd.Series, y: pd.Series) -> float:
 
 
 def _point_biserial(numeric: pd.Series, binary: pd.Series) -> float:
-    """Point-biserial correlation between a numeric and a binary series."""
-    corr, _ = pointbiserialr(binary.astype(int), numeric)
-    return float(abs(corr))
+    """
+    Point-biserial correlation between a numeric and a binary series.
+    Encodes categorical strings to 0/1 before calculation.
+    """
+    from scipy.stats import pointbiserialr
+    
+    if not pd.api.types.is_numeric_dtype(binary):
+        binary_values = pd.factorize(binary)[0]
+    else:
+        binary_values = binary.astype(int)
+        
+    try:
+        corr, _ = pointbiserialr(binary_values, numeric)
+        return float(abs(corr))
+    except Exception:
+        return 0.0
 
 
 # ---------------------------------------------------------------------------

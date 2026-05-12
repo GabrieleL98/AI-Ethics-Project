@@ -1,0 +1,472 @@
+{
+  "dataset_shape": [
+    52000,
+    28
+  ],
+  "sensitive_columns": [
+    "Gender_Male",
+    "Age_Group"
+  ],
+  "representation": {
+    "Age_Group": [
+      {
+        "group": "36-45",
+        "observed_rate": 0.343,
+        "benchmark_rate": 0.1667,
+        "absolute_gap": 0.1763,
+        "flagged": true
+      },
+      {
+        "group": "26-35",
+        "observed_rate": 0.3355,
+        "benchmark_rate": 0.1667,
+        "absolute_gap": 0.1689,
+        "flagged": true
+      },
+      {
+        "group": "46-55",
+        "observed_rate": 0.1676,
+        "benchmark_rate": 0.1667,
+        "absolute_gap": 0.0009,
+        "flagged": false
+      },
+      {
+        "group": "0-25",
+        "observed_rate": 0.0748,
+        "benchmark_rate": 0.1667,
+        "absolute_gap": 0.0919,
+        "flagged": true
+      },
+      {
+        "group": "56-65",
+        "observed_rate": 0.057,
+        "benchmark_rate": 0.1667,
+        "absolute_gap": 0.1096,
+        "flagged": true
+      },
+      {
+        "group": "65+",
+        "observed_rate": 0.022,
+        "benchmark_rate": 0.1667,
+        "absolute_gap": 0.1446,
+        "flagged": true
+      }
+    ]
+  },
+  "disparity": [
+    {
+      "feature": "Applicant_ID",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.8879,
+      "p_value": 0.487999,
+      "flagged": "False"
+    },
+    {
+      "feature": "Gender",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 3.8468,
+      "p_value": 0.571681,
+      "flagged": "False"
+    },
+    {
+      "feature": "Age",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 143637.7596,
+      "p_value": 0.0,
+      "flagged": "True"
+    },
+    {
+      "feature": "Marital_Status",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 13.6988,
+      "p_value": 0.18718,
+      "flagged": "False"
+    },
+    {
+      "feature": "Dependents",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1.7296,
+      "p_value": 0.12397,
+      "flagged": "False"
+    },
+    {
+      "feature": "Education",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 8.5948,
+      "p_value": 0.570945,
+      "flagged": "False"
+    },
+    {
+      "feature": "Employment_Status",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 11.0665,
+      "p_value": 0.352364,
+      "flagged": "False"
+    },
+    {
+      "feature": "Occupation_Type",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 18.6333,
+      "p_value": 0.230833,
+      "flagged": "False"
+    },
+    {
+      "feature": "Residential_Status",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 14.5126,
+      "p_value": 0.150868,
+      "flagged": "False"
+    },
+    {
+      "feature": "City/Town",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 15.0436,
+      "p_value": 0.13048,
+      "flagged": "False"
+    },
+    {
+      "feature": "Annual_Income",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1616.9674,
+      "p_value": 0.0,
+      "flagged": "True"
+    },
+    {
+      "feature": "Monthly_Expenses",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 2.4718,
+      "p_value": 0.030198,
+      "flagged": "True"
+    },
+    {
+      "feature": "Credit_Score",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 3241.8531,
+      "p_value": 0.0,
+      "flagged": "True"
+    },
+    {
+      "feature": "Existing_Loans",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.6455,
+      "p_value": 0.664975,
+      "flagged": "False"
+    },
+    {
+      "feature": "Total_Existing_Loan_Amount",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.6996,
+      "p_value": 0.623659,
+      "flagged": "False"
+    },
+    {
+      "feature": "Outstanding_Debt",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.5804,
+      "p_value": 0.715094,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_History",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.8578,
+      "p_value": 0.508577,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Amount_Requested",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1959.0985,
+      "p_value": 0.0,
+      "flagged": "True"
+    },
+    {
+      "feature": "Loan_Term",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.6911,
+      "p_value": 0.630122,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Purpose",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 27.2714,
+      "p_value": 0.026601,
+      "flagged": "True"
+    },
+    {
+      "feature": "Interest_Rate",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 2.4436,
+      "p_value": 0.031933,
+      "flagged": "True"
+    },
+    {
+      "feature": "Loan_Type",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 8.042,
+      "p_value": 0.153934,
+      "flagged": "False"
+    },
+    {
+      "feature": "Co-Applicant",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 4.3929,
+      "p_value": 0.494336,
+      "flagged": "False"
+    },
+    {
+      "feature": "Bank_Account_History",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.4507,
+      "p_value": 0.813042,
+      "flagged": "False"
+    },
+    {
+      "feature": "Transaction_Frequency",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1.2974,
+      "p_value": 0.261686,
+      "flagged": "False"
+    },
+    {
+      "feature": "Default_Risk",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.9823,
+      "p_value": 0.426782,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Approval_Status",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1194.039,
+      "p_value": 0.0,
+      "flagged": "True"
+    }
+  ],
+  "proxy": [
+    {
+      "feature": "Applicant_ID",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0092,
+      "flagged": false
+    },
+    {
+      "feature": "Gender",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0086,
+      "flagged": false
+    },
+    {
+      "feature": "Age",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.9657,
+      "flagged": true
+    },
+    {
+      "feature": "Marital_Status",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0115,
+      "flagged": false
+    },
+    {
+      "feature": "Dependents",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0129,
+      "flagged": false
+    },
+    {
+      "feature": "Education",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0091,
+      "flagged": false
+    },
+    {
+      "feature": "Employment_Status",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0103,
+      "flagged": false
+    },
+    {
+      "feature": "Occupation_Type",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0109,
+      "flagged": false
+    },
+    {
+      "feature": "Residential_Status",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0118,
+      "flagged": false
+    },
+    {
+      "feature": "City/Town",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.012,
+      "flagged": false
+    },
+    {
+      "feature": "Annual_Income",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.3668,
+      "flagged": true
+    },
+    {
+      "feature": "Monthly_Expenses",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0154,
+      "flagged": false
+    },
+    {
+      "feature": "Credit_Score",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.4875,
+      "flagged": true
+    },
+    {
+      "feature": "Existing_Loans",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0079,
+      "flagged": false
+    },
+    {
+      "feature": "Total_Existing_Loan_Amount",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0082,
+      "flagged": false
+    },
+    {
+      "feature": "Outstanding_Debt",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0075,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_History",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0091,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Amount_Requested",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.3982,
+      "flagged": true
+    },
+    {
+      "feature": "Loan_Term",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0082,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Purpose",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0132,
+      "flagged": false
+    },
+    {
+      "feature": "Interest_Rate",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0153,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Type",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0124,
+      "flagged": false
+    },
+    {
+      "feature": "Co-Applicant",
+      "sensitive_attribute": "Age_Group",
+      "method": "cramers_v",
+      "correlation": 0.0092,
+      "flagged": false
+    },
+    {
+      "feature": "Bank_Account_History",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0066,
+      "flagged": false
+    },
+    {
+      "feature": "Transaction_Frequency",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0112,
+      "flagged": false
+    },
+    {
+      "feature": "Default_Risk",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.0097,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Approval_Status",
+      "sensitive_attribute": "Age_Group",
+      "method": "eta",
+      "correlation": 0.3209,
+      "flagged": true
+    }
+  ],
+  "summary": {
+    "representation_flags": 5,
+    "disparity_flags": 8,
+    "proxy_flags": 5,
+    "total_flags": 18,
+    "overall_risk": "HIGH"
+  }
+}

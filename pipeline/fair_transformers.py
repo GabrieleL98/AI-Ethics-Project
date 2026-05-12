@@ -460,10 +460,20 @@ class CorrelationSuppressor(BaseEstimator, TransformerMixin):
         if self.method == "pearson" or (self.method == "auto" and feat_is_numeric):
             if sens_is_binary:
                 from scipy.stats import pointbiserialr
-                corr, _ = pointbiserialr(sensitive.astype(int), feat)
-                return float(abs(corr))
+                
+                if not pd.api.types.is_numeric_dtype(sensitive):
+                    # pd.factorize mappa automaticamente le stringhe in 0 e 1
+                    sens_values = pd.factorize(sensitive)[0]
+                else:
+                    sens_values = sensitive.astype(int)
+                
+                try:
+                    corr, _ = pointbiserialr(sens_values, feat)
+                    return float(abs(corr))
+                except Exception:
+                    return 0.0
             else:
-                # Eta correlation for multiclass sensitive
+        
                 groups = [feat[sensitive == g].dropna().values for g in sensitive.unique()]
                 if len(groups) < 2:
                     return 0.0
@@ -471,10 +481,10 @@ class CorrelationSuppressor(BaseEstimator, TransformerMixin):
                 try:
                     f, _ = f_oneway(*groups)
                     k, n = len(groups), feat.shape[0]
+                    # η² ≈ (F * df_num) / (F * df_num + df_den)
                     eta2 = (f * (k - 1)) / (f * (k - 1) + (n - k))
                     return float(np.sqrt(np.clip(eta2, 0, 1)))
                 except Exception:
                     return 0.0
 
-        # categorical feature
         return _cramers_v(feat.astype(str), sensitive.astype(str))

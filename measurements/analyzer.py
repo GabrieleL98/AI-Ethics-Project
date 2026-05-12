@@ -330,7 +330,7 @@ class FairnessAnalyzer:
         y_pred: Optional[pd.Series] = None,
         engine: str = "fairlearn",
         min_group_size: int = 5,
-        n_bootstrap: int = 1000,
+        n_bootstrap: int = 200,
         random_state: Optional[int] = None,
     ) -> Dict[str, FairnessResult]:
         """
@@ -503,7 +503,7 @@ class FairnessAnalyzer:
         y_pred: Optional[pd.Series] = None,
         target_col: Optional[str] = None,
         min_group_size: int = 5,
-        n_bootstrap: int = 1000,
+        n_bootstrap: int = 300,
         random_state: Optional[int] = None,
     ) -> FairnessResult:
         """

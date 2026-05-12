@@ -1,0 +1,428 @@
+{
+  "dataset_shape": [
+    52000,
+    27
+  ],
+  "sensitive_columns": [
+    "Gender"
+  ],
+  "representation": {
+    "Gender": [
+      {
+        "group": "Male",
+        "observed_rate": 0.5002,
+        "benchmark_rate": 0.5,
+        "absolute_gap": 0.0002,
+        "flagged": false
+      },
+      {
+        "group": "Female",
+        "observed_rate": 0.4998,
+        "benchmark_rate": 0.5,
+        "absolute_gap": 0.0002,
+        "flagged": false
+      }
+    ]
+  },
+  "disparity": [
+    {
+      "feature": "Applicant_ID",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 4.1392,
+      "p_value": 0.041907,
+      "flagged": "True"
+    },
+    {
+      "feature": "Age",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.0391,
+      "p_value": 0.843293,
+      "flagged": "False"
+    },
+    {
+      "feature": "Marital_Status",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 0.2409,
+      "p_value": 0.886514,
+      "flagged": "False"
+    },
+    {
+      "feature": "Dependents",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.1166,
+      "p_value": 0.732805,
+      "flagged": "False"
+    },
+    {
+      "feature": "Education",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 0.6654,
+      "p_value": 0.716972,
+      "flagged": "False"
+    },
+    {
+      "feature": "Employment_Status",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 0.5667,
+      "p_value": 0.75324,
+      "flagged": "False"
+    },
+    {
+      "feature": "Occupation_Type",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 1.6724,
+      "p_value": 0.643089,
+      "flagged": "False"
+    },
+    {
+      "feature": "Residential_Status",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 3.0207,
+      "p_value": 0.220827,
+      "flagged": "False"
+    },
+    {
+      "feature": "City/Town",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 2.7883,
+      "p_value": 0.248043,
+      "flagged": "False"
+    },
+    {
+      "feature": "Annual_Income",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 3.3525,
+      "p_value": 0.067109,
+      "flagged": "False"
+    },
+    {
+      "feature": "Monthly_Expenses",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.0376,
+      "p_value": 0.846342,
+      "flagged": "False"
+    },
+    {
+      "feature": "Credit_Score",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1.3105,
+      "p_value": 0.25231,
+      "flagged": "False"
+    },
+    {
+      "feature": "Existing_Loans",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.018,
+      "p_value": 0.893271,
+      "flagged": "False"
+    },
+    {
+      "feature": "Total_Existing_Loan_Amount",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 1.6048,
+      "p_value": 0.205226,
+      "flagged": "False"
+    },
+    {
+      "feature": "Outstanding_Debt",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.1432,
+      "p_value": 0.705162,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_History",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.5484,
+      "p_value": 0.458982,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Amount_Requested",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 3.0061,
+      "p_value": 0.082957,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Term",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.4419,
+      "p_value": 0.506199,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Purpose",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 4.598,
+      "p_value": 0.203716,
+      "flagged": "False"
+    },
+    {
+      "feature": "Interest_Rate",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 2.3569,
+      "p_value": 0.124734,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Type",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 0.1172,
+      "p_value": 0.732039,
+      "flagged": "False"
+    },
+    {
+      "feature": "Co-Applicant",
+      "feature_type": "categorical",
+      "test": "chi2",
+      "statistic": 2.4919,
+      "p_value": 0.114434,
+      "flagged": "False"
+    },
+    {
+      "feature": "Bank_Account_History",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.1139,
+      "p_value": 0.735748,
+      "flagged": "False"
+    },
+    {
+      "feature": "Transaction_Frequency",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.153,
+      "p_value": 0.695682,
+      "flagged": "False"
+    },
+    {
+      "feature": "Default_Risk",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 3.4204,
+      "p_value": 0.064402,
+      "flagged": "False"
+    },
+    {
+      "feature": "Loan_Approval_Status",
+      "feature_type": "numeric",
+      "test": "anova",
+      "statistic": 0.9066,
+      "p_value": 0.341019,
+      "flagged": "False"
+    }
+  ],
+  "proxy": [
+    {
+      "feature": "Applicant_ID",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0089,
+      "flagged": false
+    },
+    {
+      "feature": "Age",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0009,
+      "flagged": false
+    },
+    {
+      "feature": "Marital_Status",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0022,
+      "flagged": false
+    },
+    {
+      "feature": "Dependents",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0015,
+      "flagged": false
+    },
+    {
+      "feature": "Education",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0036,
+      "flagged": false
+    },
+    {
+      "feature": "Employment_Status",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0033,
+      "flagged": false
+    },
+    {
+      "feature": "Occupation_Type",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0057,
+      "flagged": false
+    },
+    {
+      "feature": "Residential_Status",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0076,
+      "flagged": false
+    },
+    {
+      "feature": "City/Town",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0073,
+      "flagged": false
+    },
+    {
+      "feature": "Annual_Income",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.008,
+      "flagged": false
+    },
+    {
+      "feature": "Monthly_Expenses",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0008,
+      "flagged": false
+    },
+    {
+      "feature": "Credit_Score",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.005,
+      "flagged": false
+    },
+    {
+      "feature": "Existing_Loans",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0006,
+      "flagged": false
+    },
+    {
+      "feature": "Total_Existing_Loan_Amount",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0056,
+      "flagged": false
+    },
+    {
+      "feature": "Outstanding_Debt",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0017,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_History",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0032,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Amount_Requested",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0076,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Term",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0029,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Purpose",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0094,
+      "flagged": false
+    },
+    {
+      "feature": "Interest_Rate",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0067,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Type",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0015,
+      "flagged": false
+    },
+    {
+      "feature": "Co-Applicant",
+      "sensitive_attribute": "Gender",
+      "method": "cramers_v",
+      "correlation": 0.0069,
+      "flagged": false
+    },
+    {
+      "feature": "Bank_Account_History",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0015,
+      "flagged": false
+    },
+    {
+      "feature": "Transaction_Frequency",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0017,
+      "flagged": false
+    },
+    {
+      "feature": "Default_Risk",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0081,
+      "flagged": false
+    },
+    {
+      "feature": "Loan_Approval_Status",
+      "sensitive_attribute": "Gender",
+      "method": "point_biserial",
+      "correlation": 0.0042,
+      "flagged": false
+    }
+  ],
+  "summary": {
+    "representation_flags": 0,
+    "disparity_flags": 1,
+    "proxy_flags": 0,
+    "total_flags": 1,
+    "overall_risk": "LOW"
+  }
+}
