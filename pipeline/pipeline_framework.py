@@ -178,6 +178,15 @@ class FairPipelineBuilder:
         cfg = self.config.get("preprocessing", {})
         out = df.copy()
 
+        # One-hot encode categorical columns before anything else
+        for enc_cfg in cfg.get("encode", []):
+            col = enc_cfg["column"]
+            if col not in out.columns:
+                warnings.warn(f"Encoding: column '{col}' not found — skipped.")
+                continue
+            dummies = pd.get_dummies(out[col], prefix=col, drop_first=False).astype(int)
+            out = pd.concat([out.drop(columns=[col]), dummies], axis=1)
+
         for bin_cfg in cfg.get("binning", []):
             col = bin_cfg["column"]
             bins = [float(b) for b in bin_cfg["bins"]]
@@ -244,7 +253,7 @@ class FairPipelineBuilder:
                 t = transformer_cls(**params)
                 t.fit(df)
                 self._sample_weight = t.sample_weight_
-                steps.append((t_cfg["name"], t))
+                # steps.append((t_cfg["name"], t))
             else:
                 steps.append((t_cfg["name"], transformer_cls(**params)))
 
