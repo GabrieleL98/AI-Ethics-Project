@@ -30,7 +30,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from .fairness_regularizer import FairnessRegularizer
+from fairness_regularizer import FairnessRegularizer
 
 
 # ---------------------------------------------------------------------------
