@@ -298,7 +298,7 @@ class FairnessAnalyzer:
         df_reset = df.reset_index(drop=True)
 
         # Pre-compute group indices once (stratified bootstrap)
-        groups = df.groupby(self.sensitive_col, sort=False)
+        groups = df_reset.groupby(self.sensitive_col, sort=False)
         group_indices = {name: grp.index.to_numpy() for name, grp in groups}
 
         for _ in range(n_iterations):
