@@ -55,6 +55,21 @@ from fair_transformers import (
     InstanceReweighting,
     SMOTEResampler,
 )
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OrdinalEncoder, StandardScaler
+from sklearn.pipeline import Pipeline as SKPipeline
+
+def _build_preprocessor(df: pd.DataFrame):
+    cat_cols = df.select_dtypes(include=['object', 'category']).columns.tolist()
+    num_cols = df.select_dtypes(include='number').columns.tolist()
+
+    return ColumnTransformer(
+        transformers=[
+            ('num', StandardScaler(), num_cols),
+            ('cat', OrdinalEncoder(handle_unknown='use_encoded_value', unknown_value=-1), cat_cols),
+        ],
+        remainder='drop'
+    )
 
 # ---------------------------------------------------------------------------
 # Transformer registry  – maps config class names → Python classes
@@ -312,6 +327,18 @@ class FairPipelineBuilder:
         feature_cols = [c for c in df_processed.columns if c not in exclude]
         X = df_processed[feature_cols + sensitive_cols]   # keep sensitive for transformers
         y = df_processed[target_col]
+
+        cat_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
+        if cat_cols:
+            from sklearn.preprocessing import OrdinalEncoder
+            enc = OrdinalEncoder(
+                handle_unknown="use_encoded_value",
+                unknown_value=-1,
+            )
+            X = X.copy()
+            X[cat_cols] = enc.fit_transform(X[cat_cols])
+            self._categorical_encoder = enc          # salvato per predict
+            self._encoded_cat_cols    = cat_cols
 
         # 5. Fit — pass sample_weight if InstanceReweighting was used
         fit_params = {}
