@@ -55,6 +55,7 @@ from fair_transformers import (
     InstanceReweighting,
     SMOTEResampler,
 )
+from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OrdinalEncoder, StandardScaler
 from sklearn.pipeline import Pipeline as SKPipeline
@@ -70,6 +71,33 @@ def _build_preprocessor(df: pd.DataFrame):
         ],
         remainder='drop'
     )
+
+class DataFrameOrdinalEncoder(BaseEstimator, TransformerMixin):
+    """
+    OrdinalEncoder che accetta DataFrame, codifica solo le colonne
+    object/category e restituisce un DataFrame con gli stessi nomi.
+    I transformer successivi (DisparateImpactRemover, ecc.) possono
+    così continuare a referenziare le colonne per nome.
+    """
+    def __init__(self):
+        self._enc = OrdinalEncoder(
+            handle_unknown='use_encoded_value',
+            unknown_value=-1,
+        )
+        self._cat_cols: List[str] = []
+
+    def fit(self, X: pd.DataFrame, y=None):
+        self._cat_cols = X.select_dtypes(include=['object', 'category']).columns.tolist()
+        if self._cat_cols:
+            self._enc.fit(X[self._cat_cols])
+        return self
+
+    def transform(self, X: pd.DataFrame, y=None) -> pd.DataFrame:
+        if not self._cat_cols:
+            return X
+        X = X.copy()
+        X[self._cat_cols] = self._enc.transform(X[self._cat_cols])
+        return X
 
 # ---------------------------------------------------------------------------
 # Transformer registry  – maps config class names → Python classes
@@ -104,6 +132,7 @@ class FairPipelineResult:
     sample_weight: Optional[np.ndarray]
     feature_cols: List[str]
     config: Dict[str, Any] = field(default_factory=dict)
+    df_processed: Optional[pd.DataFrame] = None
 
 
 # ---------------------------------------------------------------------------
@@ -247,6 +276,9 @@ class FairPipelineBuilder:
         """
         steps: List[tuple] = []
 
+        if df is not None:
+            steps.append(("encoder", DataFrameOrdinalEncoder()))
+
         for t_cfg in self.config.get("transformers", []):
             if not t_cfg.get("enabled", True):
                 continue
@@ -328,18 +360,6 @@ class FairPipelineBuilder:
         X = df_processed[feature_cols + sensitive_cols]   # keep sensitive for transformers
         y = df_processed[target_col]
 
-        cat_cols = X.select_dtypes(include=["object", "category"]).columns.tolist()
-        if cat_cols:
-            from sklearn.preprocessing import OrdinalEncoder
-            enc = OrdinalEncoder(
-                handle_unknown="use_encoded_value",
-                unknown_value=-1,
-            )
-            X = X.copy()
-            X[cat_cols] = enc.fit_transform(X[cat_cols])
-            self._categorical_encoder = enc          # salvato per predict
-            self._encoded_cat_cols    = cat_cols
-
         # 5. Fit — pass sample_weight if InstanceReweighting was used
         fit_params = {}
         if self._sample_weight is not None:
@@ -354,6 +374,7 @@ class FairPipelineBuilder:
             sample_weight=self._sample_weight,
             feature_cols=feature_cols,
             config=self.config,
+            df_processed=df_processed,
         )
 
     # ------------------------------------------------------------------
