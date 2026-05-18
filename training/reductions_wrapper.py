@@ -120,40 +120,61 @@ class ReductionsWrapper(BaseEstimator, ClassifierMixin):
     # ------------------------------------------------------------------
 
     def predict(self, X) -> np.ndarray:
-        """Return predicted class labels."""
-        check_is_fitted(self, "_reduction")
-        return self._reduction.predict(X)
+        """Return predicted class labels, consistent with predict_proba."""
+        check_is_fitted(self)
+        proba = self.predict_proba(X)
+        indices = np.argmax(proba, axis=1)
+        return self.classes_[indices]
 
     def predict_proba(self, X) -> np.ndarray:
         """Return class probabilities (if base estimator supports it)."""
-        check_is_fitted(self, "_reduction")
-        return self._reduction.predict_proba(X)
+        check_is_fitted(self)
 
-    # ------------------------------------------------------------------
-    # Inspection helpers
-    # ------------------------------------------------------------------
+        # ExponentiatedGradient does not directly support predict_proba, so we implement it here.
+        # Calculated as weighted average of the base predictors' probabilities.
+        predictions = np.array([
+            est.predict_proba(X)
+            for est in self._reduction.predictors_
+        ])
+        weights = np.array(self._reduction.weights_)
+
+        # predictions: shape (n_estimators, n_samples, n_classes)
+        # weights:     shape (n_estimators,)
+        weighted = np.tensordot(weights, predictions, axes=([0], [0]))
+        # weighted: shape (n_samples, n_classes)
+        return weighted
+   # ------------------------------------------------------------------
+# Inspection helpers
+# ------------------------------------------------------------------
 
     @property
     def predictors_(self):
         """List of base estimators trained during the reductions sweep."""
-        check_is_fitted(self, "_reduction")
+        check_is_fitted(self)
         return self._reduction.predictors_
 
     @property
     def weights_(self) -> np.ndarray:
         """Mixture weights over the predictor ensemble."""
-        check_is_fitted(self, "_reduction")
-        return self._reduction.weights_
+        check_is_fitted(self)
+        return np.array(self._reduction.weights_)
 
     @property
-    def best_result_(self):
-        """Best result dict from ExponentiatedGradient."""
-        check_is_fitted(self, "_reduction")
-        return self._reduction.best_result_
+    def best_estimator_(self):
+        """The single estimator with the highest mixture weight."""
+        check_is_fitted(self)
+        best_idx = np.argmax(self.weights_)
+        return self.predictors_[best_idx]
+
+    @property
+    def best_weight_(self) -> float:
+        """The highest mixture weight in the ensemble."""
+        check_is_fitted(self)
+        return float(np.max(self.weights_))
 
     def summary(self) -> str:
         """Human-readable training summary."""
-        check_is_fitted(self, "_reduction")
+        check_is_fitted(self)
         n_pred = len(self.predictors_)
         top_w = sorted(
             zip(self.weights_, range(n_pred)), reverse=True
@@ -163,6 +184,8 @@ class ReductionsWrapper(BaseEstimator, ClassifierMixin):
             f"Constraint    : {type(self.constraint).__name__}",
             f"eps           : {self.eps}",
             f"Predictors    : {n_pred}",
-            f"Top weights   : {[(round(w,4), i) for w, i in top_w]}",
+            f"Top weights   : {[(round(w, 4), i) for w, i in top_w]}",
+            f"Best estimator: predictor[{np.argmax(self.weights_)}] "
+            f"(weight={self.best_weight_:.4f})",
         ]
         return "\n".join(lines)
