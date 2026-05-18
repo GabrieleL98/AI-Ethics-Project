@@ -91,7 +91,7 @@ def _train_single(
     epochs: int,
     lr: float,
     sensitive_key: str,
-    sensitive_dict_key: Optional[str],
+    sensitive_dict_key: Optional[List[str]] = None,  
 ) -> Tuple[float, float]:
     """Train one model with the given eta and return (accuracy, dp_gap)."""
     model = model_fn().to(device)

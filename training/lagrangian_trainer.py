@@ -42,6 +42,7 @@ def demographic_parity_constraint(
     logits: torch.Tensor,
     sensitive: torch.Tensor,
     slack: float = 0.0,
+    **kwargs,
 ) -> torch.Tensor:
     """
     Demographic parity: |P(ŷ=1|A=0) - P(ŷ=1|A=1)| - slack ≤ 0.
@@ -68,6 +69,7 @@ def equalized_odds_constraint(
     sensitive: torch.Tensor,
     targets: torch.Tensor,
     slack: float = 0.0,
+    **kwargs,
 ) -> torch.Tensor:
     """
     Equalized odds: equalise TPR and FPR across groups.
@@ -174,7 +176,7 @@ class LagrangianFairnessTrainer:
         logits: torch.Tensor,
         targets: torch.Tensor,
         sensitive: torch.Tensor,
-    ):
+    ) -> tuple:
         """
         L(θ, λ) = BCE(θ) + Σ λ_i · g_i(θ)
 
@@ -183,13 +185,13 @@ class LagrangianFairnessTrainer:
         bce = self._bce(logits, targets.float())
         violations = []
         for fn, kw in zip(self.constraint_fns, self.constraint_kwargs):
-            v = fn(logits, sensitive, **kw) - self.constraint_slack
+            v = fn(logits, sensitive, targets=targets, **kw) - self.constraint_slack
             violations.append(v)
 
-        lagrangian = bce + sum(
-            self.multipliers[i] * violations[i]
+        lagrangian = bce + torch.stack([
+            self.multipliers.detach()[i] * violations[i]
             for i in range(len(violations))
-        )
+        ]).sum()
         return lagrangian, bce.item(), [v.item() for v in violations]
 
     # ------------------------------------------------------------------
@@ -217,12 +219,23 @@ class LagrangianFairnessTrainer:
 
             # --- Descent on model weights ---
             self._model_opt.zero_grad()
-            lagrangian.backward(retain_graph=True)
+            lagrangian.backward()
             self._model_opt.step()
 
-            # --- Ascent on multipliers: maximise L w.r.t. λ ---
+            # --- Ascent on multipliers ---
+            logits_dual = self.model(X).squeeze(-1)   # fresh forward pass
+            dual_violations = [
+                fn(logits_dual, sensitive, targets=y, **kw) - self.constraint_slack
+                for fn, kw in zip(self.constraint_fns, self.constraint_kwargs)
+            ]
+            # Compute violations gradient manually
+            dual_loss = torch.stack([
+                self.multipliers[i] * dual_violations[i]
+                for i in range(len(dual_violations))
+            ]).sum()
+
             self._mult_opt.zero_grad()
-            (-lagrangian).backward()
+            (-dual_loss).backward()
             self._mult_opt.step()
 
             # Project multipliers onto non-negative orthant
