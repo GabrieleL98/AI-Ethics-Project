@@ -22,11 +22,14 @@ from typing import Dict, List, Optional, Tuple
 import numpy as np
 import pandas as pd
 from scipy import stats
+from typing import cast
 
 
 # ---------------------------------------------------------------------------
 # Optional wavelet import (PyWavelets)
 # ---------------------------------------------------------------------------
+pywt = None
+
 try:
     import pywt  # type: ignore
     _WAVELET_AVAILABLE = True
@@ -280,7 +283,9 @@ class FairnessDriftAndAlertEngine:
         reference = series.iloc[:self.reference_window].values
         recent = series.iloc[self.reference_window:].values
 
-        ks_stat, p_value = stats.ks_2samp(reference, recent)
+        ks_result = stats.ks_2samp(reference, recent)
+        ks_stat = cast(float, ks_result[0])
+        p_value = cast(float, ks_result[1])
         threshold = self.get_threshold(metric)
 
         if p_value >= self.ks_alpha and ks_stat < threshold:
@@ -293,7 +298,7 @@ class FairnessDriftAndAlertEngine:
         severity = self._classify_severity(severity_score)
 
         # Wavelet multi-scale analysis
-        wavelet_trend = self._wavelet_analysis(series.values)
+        wavelet_trend = self._wavelet_analysis(np.asarray(series, dtype=float))
 
         # Identify most-affected group if group column present
         group = self._most_affected_group(history, metric)
@@ -359,7 +364,7 @@ class FairnessDriftAndAlertEngine:
         Decompose the metric time series with a discrete wavelet transform.
         Returns 'spike' (short-term), 'trend' (long-term), or None.
         """
-        if not _WAVELET_AVAILABLE or len(signal) < 8:
+        if pywt is None or len(signal) < 8:
             return None
 
         try:
