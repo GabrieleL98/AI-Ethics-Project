@@ -16,13 +16,10 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
-from monitoring import (
-    RealTimeFairnessTracker,
-    FairnessDriftAndAlertEngine,
-    FairnessReportingDashboard,
-    FairnessABTestAnalyzer,
-)
-
+from tracker    import RealTimeFairnessTracker
+from drift      import FairnessDriftAndAlertEngine
+from reporting  import FairnessReportingDashboard
+from ab_testing import FairnessABTestAnalyzer
 # ---------------------------------------------------------------------------
 # Page config
 # ---------------------------------------------------------------------------
@@ -39,7 +36,7 @@ st.set_page_config(
 def _simulate_batch(
     n: int = 200,
     drift: float = 0.0,
-    rng: np.random.Generator = None,
+    rng: np.random.Generator | None = None,
 ) -> dict:
     """Generate a synthetic production batch with optional bias drift."""
     rng = rng or np.random.default_rng()
