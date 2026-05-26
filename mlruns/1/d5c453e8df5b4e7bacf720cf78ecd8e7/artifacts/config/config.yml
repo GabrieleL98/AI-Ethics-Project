@@ -1,0 +1,79 @@
+# config.yml
+# ==========
+# FairML Toolkit — Part 5: Pipeline Orchestrator Configuration
+#
+# This file fully defines one reproducible fair ML workflow.
+# Edit the values below to switch datasets, transformers, or constraints
+# without touching any code.
+
+# ---------------------------------------------------------------------------
+# Dataset
+# ---------------------------------------------------------------------------
+data:
+  path: "data/loan_dataset.csv"
+  target_col: "Loan_Approval_Status"
+  sensitive_col: "Gender_Male"      # must be numeric (0/1) after preprocessing
+  positive_label: 1
+  drop_cols: []                     # columns to discard before anything runs
+
+# ---------------------------------------------------------------------------
+# Raw preprocessing
+# Runs before the fairness transformer so the dataset is in the expected shape.
+# ---------------------------------------------------------------------------
+preprocessing:
+  encode:
+    - column: "Gender"              # one-hot encodes → keeps Gender_Male (drop_first=True)
+  binning: []                       # add entries here if you need pd.cut on any column
+  #  - column: "Age"
+  #    bins: [0, 25, 35, 45, 55, 65, .inf]
+  #    labels: ["0-25","26-35","36-45","46-55","56-65","65+"]
+  #    new_column: "Age_Group"
+
+# ---------------------------------------------------------------------------
+# Step 2a — Fairness Transformer  (pre-processing mitigation)
+# Exactly ONE transformer, resolved from the PipelineModule registry.
+# Available classes: DisparateImpactRemover | CorrelationSuppressor | InstanceReweighting
+# ---------------------------------------------------------------------------
+transformer:
+  class: "DisparateImpactRemover"
+  params:
+    sensitive_col: "Gender_Male"
+    repair_level: 0.8               # 0 = no repair, 1 = full repair
+    features_to_repair:
+      - "Annual_Income"
+      - "Credit_Score"
+
+# ---------------------------------------------------------------------------
+# Step 2b — Fair Training  (in-processing mitigation)
+# Exactly ONE method, resolved from the TrainingModule registry.
+# Available base estimators : LogisticRegression
+# Available constraints     : DemographicParity | EqualizedOdds | BoundedGroupLoss
+# ---------------------------------------------------------------------------
+training:
+  method: "ReductionsWrapper"
+  base_estimator: "LogisticRegression"
+  base_estimator_params:
+    max_iter: 1000 
+    random_state: 42
+  constraint: "DemographicParity"
+  constraint_params: {}             # leave empty to use fairlearn defaults
+  eps: 0.01                        # allowed constraint-violation tolerance
+  max_iter: 50                     # ExponentiatedGradient iterations
+
+# ---------------------------------------------------------------------------
+# Step 3 — Validation gate
+# The pipeline prints PASS / FAIL based on whether the final primary metric
+# falls within the threshold.
+# ---------------------------------------------------------------------------
+validation:
+  primary_metric: "demographic_parity_difference"   # key returned by FairnessAnalyzer
+  threshold: 0.10                                   # |metric| must be <= this to pass
+  n_bootstrap: 200                                  # bootstrap replications for CIs
+  test_size: 0.2                                    # train/test split ratio
+
+# ---------------------------------------------------------------------------
+# MLflow
+# ---------------------------------------------------------------------------
+mlflow:
+  experiment_name: "fairness_pipeline_run"
+  run_name: "gender_demographic_parity"
