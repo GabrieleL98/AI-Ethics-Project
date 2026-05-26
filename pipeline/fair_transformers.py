@@ -33,7 +33,9 @@ from __future__ import annotations
 
 import warnings
 from typing import List, Optional, Union
+from typing import cast
 
+from narwhals import corr
 import numpy as np
 import pandas as pd
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -124,7 +126,8 @@ class InstanceReweighting(BaseEstimator, TransformerMixin):
 
         # Weight = P(S) * P(Y) / P(S, Y)   [independence assumption]
         weights_map = {}
-        for (s, y_val), p_joint in joint.items():
+        for idx, p_joint in joint.items():
+            s, y_val = idx  # type: ignore[misc]
             expected = float(p_s[s]) * float(p_y[y_val])
             weights_map[(s, y_val)] = expected / p_joint if p_joint > 0 else 1.0
 
@@ -133,7 +136,7 @@ class InstanceReweighting(BaseEstimator, TransformerMixin):
                 (row[self.sensitive_col], row[self.target_col]), 1.0
             ),
             axis=1,
-        ).values.astype(float)
+        ).astype(float)
 
         if self.normalise:
             raw_weights = raw_weights / raw_weights.mean()
@@ -209,7 +212,7 @@ class SMOTEResampler(BaseEstimator, TransformerMixin):
         self.is_fitted_ = True
         return self
 
-    def fit_transform(self, X, y=None, **fit_params):
+    def fit_transform(self, X, y=None, **fit_params) -> pd.DataFrame: # type: ignore[override]
         try:
             from imblearn.over_sampling import SMOTE
         except ImportError as exc:
@@ -244,7 +247,9 @@ class SMOTEResampler(BaseEstimator, TransformerMixin):
                 continue
 
             smote = SMOTE(k_neighbors=self.k_neighbors, random_state=self.random_state)
-            X_res, y_res = smote.fit_resample(X_g, y_g)
+            result = smote.fit_resample(X_g, y_g)
+            X_res = cast(np.ndarray, result[0])
+            y_res = cast(np.ndarray, result[1])
 
             chunk = pd.DataFrame(X_res, columns=feature_cols)
             chunk[self.target_col] = y_res
@@ -331,7 +336,7 @@ class DisparateImpactRemover(BaseEstimator, TransformerMixin):
 
         # Store the overall (marginal) sorted values per feature
         self.marginal_sorted_: dict = {
-            col: np.sort(df[col].dropna().values)
+            col: np.sort(np.array(df[col].dropna(), dtype=float))
             for col in self.repair_cols_
         }
         self.feature_names_in_ = list(df.columns)
@@ -345,11 +350,12 @@ class DisparateImpactRemover(BaseEstimator, TransformerMixin):
         for col in self.repair_cols_:
             if col not in df.columns:
                 continue
+            out[col] = out[col].astype(float) 
             marginal = self.marginal_sorted_[col]
 
             for group_val in df[self.sensitive_col].unique():
                 mask = df[self.sensitive_col] == group_val
-                group_vals = df.loc[mask, col].values
+                group_vals = pd.Series(df.loc[mask, col]).to_numpy()
 
                 # Quantile-map group values → marginal distribution
                 group_sorted_idx = np.argsort(group_vals)
@@ -468,7 +474,7 @@ class CorrelationSuppressor(BaseEstimator, TransformerMixin):
                     sens_values = sensitive.astype(int)
                 
                 try:
-                    corr, _ = pointbiserialr(sens_values, feat)
+                    corr = cast(float, pointbiserialr(sens_values, feat)[0])
                     return float(abs(corr))
                 except Exception:
                     return 0.0

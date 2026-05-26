@@ -53,7 +53,7 @@ training:
   method: "ReductionsWrapper"
   base_estimator: "LogisticRegression"
   base_estimator_params:
-    max_iter: 1000 
+    max_iter: 500
     random_state: 42
   constraint: "DemographicParity"
   constraint_params: {}             # leave empty to use fairlearn defaults
